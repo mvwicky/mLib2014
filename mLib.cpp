@@ -16,6 +16,10 @@ class link {
 	private:
 		int	lineSensors [5]; 
 		int previousState[5];
+		int cases2;
+		int cases3;
+		int cases4;
+		int cases5;
 		int thresh;
 		struct driveMotors {
 			Motor *motor;
@@ -76,11 +80,15 @@ class link {
 			int driveFor(int , int);
 			int driveDistance(int , float);
 			// Sensor Use Methods
+			int waitForLight(int);
 			int setLines(int , int , int , int , int); // this method sets the indicies for the line sensors (number them from left to right)
 			bool smallTopHatOn(int);
 			bool sensorsOn(bool conditions []);
 			int lineFollowTwo();
-			int lineFollowThree()
+			int lineFollowThree();
+			int lineFollowFour();
+			int lineFollowFive();
+
 
 };
 
@@ -90,6 +98,43 @@ link::link(int lport , int rport , int threshold) {
 	left.dEMF = new BackEMF(lport);
 	right.dEMF = new BackEMF(rport);
 	thresh = threshold;
+	bool cases2[4][2] = {
+ 		{0 , 1}, 
+ 		{1 , 0},
+ 		{1 , 1}, 
+ 		{0 , 0}
+ 	};
+ 	bool cases3[6][3] = {
+		{1 , 0 , 0},
+		{1 , 1 , 0},
+		{1 , 1 , 1},
+		{0 , 1 , 1},
+		{0 , 0 , 1},
+		{0 , 0 , 0}
+	};
+	bool cases4[8][4] = {
+		{1 , 0 , 0 , 0}, 
+		{1 , 1 , 0 , 0},
+		{1 , 1 , 1 , 0},
+		{1 , 1 , 1 , 1},
+		{0 , 1 , 1 , 1},
+		{0 , 0 , 1 , 1},
+		{0 , 0 , 0 , 1},
+		{0 , 0 , 0 , 0},
+		{0 , 1 , 1 , 0}
+	};
+	bool cases5[13][5] =  {
+		{1 , 0 , 0 , 0 , 0},
+		{1 , 1 , 0 , 0 , 0},
+		{1 , 1 , 1 , 0 , 0},
+		{1 , 1 , 1 , 1 , 0},
+		{1 , 1 , 1 , 1 , 1},
+		{1 , 1 , 1 , 1 , 0},
+		{1 , 1 , 1 , 0 , 0},
+		{1 , 1 , 0 , 0 , 0},
+		{1 , 0 , 0 , 0 , 0},
+		{0 , 0 , 0 , 0 , 0}
+	};
 }
 
 int link::buildLeftMotor(float diameter , float radiusToMiddle) {
@@ -259,13 +304,16 @@ int link::driveFor(int speed , int mtime) {
 	left.motor->moveAtVelocity(speed);
 	right.motor->moveAtVelocity(speed);
 	msleep(mtime);
+	left.motor.off();
+	right.motor.off();
 	return 0;
 }
 
 int link::driveDistance(int speed , float distance) {
-	float ticks = (distance * 1000) / (left.diameter * PI);
-	left.motor->moveRelativePosition(speed , (int)ticks);
-	right.motor->moveRelativePosition(speed , (int)ticks);
+	float lticks = (distance * 1000) / (left.diameter * PI);
+	float rticks = (distance * 1000) / (right.diamter * PI);
+	left.motor->moveRelativePosition(speed , (int)lticks);
+	right.motor->moveRelativePosition(speed , (int)rticks);
 	left.motor->blockMotorDone();
 	right.motor->blockMotorDone();
 	return 0;
@@ -302,30 +350,24 @@ int link::lineFollowTwo() {
 		std::cout << "You have more than two line sensors defined" << std::endl;
 		std::cout << "Behavior may be weird" << std::endl;
  	}
- 	int cases[4][2] = {
- 		{0 , 1}, 
- 		{1 , 0},
- 		{1 , 1}, 
- 		{0 , 0}
- 	};
- 	if (sensorsOn(cases[0]) { // left off , right on
+ 	if (sensorsOn(cases2[0]) { // left off , right on
  		left.moveAtVelocity(SPEED1);
  		right.moveAtVelocity(SPEED5);
  		msleep(10);
  		return 0;
  	}
- 	if (sensorsOn(cases[1]) { // left on , right off
+ 	if (sensorsOn(cases2[1]) { // left on , right off
  		left.moveAtVelocity(SPEED5);
  		right.moveAtVelocity(SPEED1);
  		msleep(10);
  		return 0;
  	}
- 	if (sensorsOn(cases[2]) { // left on , right on
+ 	if (sensorsOn(cases2[2]) { // left on , right on
 
  		msleep(10);
  		return 0;
  	}
- 	if (sensorsOn(cases[3]) { // left off , right off
+ 	if (sensorsOn(cases2[3]) { // left off , right off
  		msleep(10);
  		return 0;
  	}
@@ -337,12 +379,12 @@ int link::lineFollowThree() {
 		std::cout << "You have more than three line sensors defined" << std::endl;
 		std::cout << "Behavior may be weird" << std::endl;
 	}
-	int cases[6][3] = {
-		{1 , 0 , 0},
-		{1 , 1 , 0},
-		{1 , 1 , 1},
-		{0 , 1 , 1},
-		{0 , 0 , 1},
-		{0 , 0 , 0}
-	};
+}
+
+int link::lineFollowFour() {
+
+}
+
+int link::lineFollowFive() {
+
 }
