@@ -1,17 +1,21 @@
 #define PI 3.1415926
 #define dia 560
 
-#define diff 100
+#define diff 30
 #define mid 950
 
-#define high mid + diff
-#define low mid - diff
+#define SPEED5 mid + (3 * diff) //fastest
+#define SPEED4 mid + (2 * diff)
+#define SPEED3 mid + diff
+#define SPEED2 mid - (2 * diff)
+#define SPEED1 mid - (3 * diff) //slowest
 
 #define thresh 450 
 
 class link {
 	private:
 		int	lineSensors [5]; 
+		int previousState[5];
 		int thresh;
 		struct driveMotors {
 			Motor *motor;
@@ -49,7 +53,8 @@ class link {
 			int newLargeTopHat(int); // makes a new large top hat sensor
 			int newLightSensor(int , int); // makes a new light sensor		
 			int newLinearSlide(int); // makes a new linear slide		
-			int newPot(int); // makes a new potentiometer					
+			int newPot(int); // makes a new potentiometer
+			// getters					
 			int getET(); // gets value from ET sensor
 			int getSmallTopHat(int); // gets the value from a small top hat sensor
 			int getLargeTopHat(); // gets the values from the large top hat sensor
@@ -61,6 +66,7 @@ class link {
 			int newSlot(int , int); // makes a new slot
 			int newSmallTouch(int , int); // makes a new small touch
 			int newLargeTouch(int , int); // makes a new large touch
+			// getters
 			bool getLever(int); // gets lever on/off
 			bool getSlot(int); // gets slot on/off
 			bool getSmallTouch(int); // gets small touch on/off
@@ -73,6 +79,8 @@ class link {
 			int setLines(int , int , int , int , int); // this method sets the indicies for the line sensors (number them from left to right)
 			bool smallTopHatOn(int);
 			bool sensorsOn(bool conditions []);
+			int lineFollowTwo();
+			int lineFollowThree()
 
 };
 
@@ -280,5 +288,61 @@ bool link::smallTopHatOn(int index) {
 
 bool link::sensorsOn(bool conditions []) {
 	int conds = sizeof(conditions) - 1;
-	
+	bool ret = true;
+	for (int i; i < conds; i++) {
+		if (smallTopHatOn[i] != conditions[i]) {
+			return ret = false;
+		}
+	}
+	return true;
+}
+
+int link::lineFollowTwo() {
+	if (lineSensors[2] != 9) {
+		std::cout << "You have more than two line sensors defined" << std::endl;
+		std::cout << "Behavior may be weird" << std::endl;
+ 	}
+ 	int cases[4][2] = {
+ 		{0 , 1}, 
+ 		{1 , 0},
+ 		{1 , 1}, 
+ 		{0 , 0}
+ 	};
+ 	if (sensorsOn(cases[0]) { // left off , right on
+ 		left.moveAtVelocity(SPEED1);
+ 		right.moveAtVelocity(SPEED5);
+ 		msleep(10);
+ 		return 0;
+ 	}
+ 	if (sensorsOn(cases[1]) { // left on , right off
+ 		left.moveAtVelocity(SPEED5);
+ 		right.moveAtVelocity(SPEED1);
+ 		msleep(10);
+ 		return 0;
+ 	}
+ 	if (sensorsOn(cases[2]) { // left on , right on
+
+ 		msleep(10);
+ 		return 0;
+ 	}
+ 	if (sensorsOn(cases[3]) { // left off , right off
+ 		msleep(10);
+ 		return 0;
+ 	}
+ 	return 1;
+}
+
+int link::lineFollowThree() {
+	if (lineSensors[3] != 9) {
+		std::cout << "You have more than three line sensors defined" << std::endl;
+		std::cout << "Behavior may be weird" << std::endl;
+	}
+	int cases[6][3] = {
+		{1 , 0 , 0},
+		{1 , 1 , 0},
+		{1 , 1 , 1},
+		{0 , 1 , 1},
+		{0 , 0 , 1},
+		{0 , 0 , 0}
+	};
 }
